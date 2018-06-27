@@ -43,6 +43,7 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="nav navbar-nav navbar-right">
                         <!-- Authentication Links -->
+                        <li><a href="{{ url('/analytics') }}">Analytics</a></li>
                         <li><a href="{{ url('/invoices') }}">Invoices</a></li>
                         <li><a href="{{ url('/posts') }}">Posts</a></li>
                         <li><a href="{{ url('/products') }}">Products</a></li>
@@ -80,6 +81,6 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
-    
+
 </body>
 </html>

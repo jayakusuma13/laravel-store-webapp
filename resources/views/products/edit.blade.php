@@ -79,7 +79,7 @@
            <tr>
              <td class="col-md-7">
                 <img src="{{ Storage::url($eachimage->images) }}" height="100" width="100">
-                <input type="hidden" name="image[]" value="{{ Storage::url($eachimage->images) }}">
+                <input type="hidden" name="imageList[]" value="{{ $eachimage->images }}" multiple>
              </td>
              <td class="col-md-2">
                  <button type="button" class="btn btn-danger">
@@ -92,27 +92,26 @@
                     </div>
                     <div class="action-buttons">
                         <!--<button id="add-form" type="button" class="btn btn-default">Add New Image</button>-->
-                        <input id="add-form" type="file" name="image[]" multiple>
+                        <input id="add-form" type="file" name="images[]" id="images" multiple>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    <input id="deleteImages" name="deleteImages" type="hidden" value="">
+                    </form>
                     </div>
-
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-md-6 col-md-offset-4">
-                            <button type="submit" class="btn btn-primary">
-                                Update
-                            </button>
-                        </div>
-                    </div>
-                  </form>
                 </div>
-            </div>
+
         </div>
 
         <script src="{{ asset('js/app.js') }}"></script>
 
         <script>
         $(document).ready(function(){
+
+          var formdata = false;
+          if (window.FormData) {
+            formdata = new FormData();
+          }
+
+          var deleteImagesList = [];
 
         function filepreview(input,i){
           var reader = new FileReader();
@@ -121,7 +120,7 @@
                '<tbody id="row'+i+'"><tr>'+
                  '<td class="col-md-7">'+
                     '<img id="image" src="'+e.target.result+'" height="100" width="100">'+
-                    '<input type="hidden" name="image[]" value="'+e.target.result+'">'+
+                    '<input type="hidden" name="imageList[]" value="'+e.target.result+'" multiple>'+
                  '</td>'+
                  '<td class="col-md-2">'+
                      '<button type="button" class="btn btn-danger">'+
@@ -131,14 +130,53 @@
             );
           }
           reader.readAsDataURL(input.files[i]);
+
+          if(formdata){
+            formdata.append("images[]",input.files[i])
+            console.log(formdata);
+          };
         }
 
+
+
+        $(document).on('submit','#editForm',function(){
+          console.log('dude');
+          if(formdata){
+            console.log('dude');
+            $.ajax({
+              url: "{{ route('products.update',$post->id) }}",
+              type: "POST",
+              data: formdata,
+              processData: false,
+              contentType: false
+              });
+            };
+        });
+
+
+//        var imagesToUpload = [];
         var i = 1;
-        $('#add-form').change(function() {
+        $(document).on('change','#add-form',function() {
             var curFiles = this.files;
             for(var i=0;i<curFiles.length;i++){
               filepreview(this,i);
+//              imagesToUpload += this.files;
+//              console.log(imagesToUpload.files);
             }
+        });
+
+        $(document).on('click','.btn-danger',function(){
+          var z = $(this).parent().parent().find('td.col-md-7').children();
+          var zz = $(this).parent().parent().find('input[name*="image"]').val();
+
+          $(this).parent().parent().remove();
+          $('.action-buttons').children()[0].remove();
+          $('.action-buttons').prepend('<input id="add-form" name="image" type="file" multiple>');
+
+          deleteImagesList.push(zz);
+          console.log(deleteImagesList);
+          $('#deleteImages').val(JSON.stringify(deleteImagesList));
+
         });
 
         });

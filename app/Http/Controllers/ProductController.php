@@ -148,20 +148,39 @@ class ProductController extends Controller
       $postId = $post->id;
       $productImages = ProductImages::where('productId',$postId)->get();
 
-      
+/*
           foreach($productImages as $productImage){
             Storage::delete($productImage->images);
             $productImage->delete();
+        }
+*/
+        if(isset($request->deleteImages)){
+          $deleteImageArray = json_decode($request->deleteImages);
+          foreach($deleteImageArray as $deleteImage){
+            $savedImage = ProductImages::where('images',$deleteImage)->first();
+            if(isset($savedImage)){
+              Storage::delete($savedImage->images);
+              $savedImage->delete();
+            };
 
-          foreach($request->image as $image){
+          }
+        }
+
+
+
+
+        if(isset($request->images)){
+          foreach($request->images as $image){
               $postImage = new ProductImages;
               $path = $image->store('public/product_images');
               $postImage->productId = $postId;
               $postImage->images = $path;
               $postImage->save();
         }
+        }
 
-      }
+
+
 
 /*
       if($request->file('image') != null){

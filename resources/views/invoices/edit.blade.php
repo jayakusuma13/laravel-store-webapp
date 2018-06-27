@@ -78,12 +78,12 @@
 
                @foreach($products as $product)
                @if($product->item == $item->item && $product->price == $item->price)
-                <option selected value={{$product->id}}>{{$product->item}} - {{$product->price}}</option>
+                <option selected value={{$product->id}} label='{{$product->item}} - {{$product->price}}'>{{$product->price}}</option>
                @endif
-                 <option value={{$product->id}}>{{$product->item}} - {{$product->price}}</option>
+                 <option value={{$product->id}} label='{{$product->item}} - {{$product->price}}'>{{$product->price}}</option>
                @endforeach
              </select></td>
-             <td class="col-md-3"><input type="text" value="{{ $item->price }}" name="price[]" class="form-control" /></td>
+             <td class="col-md-3"><input class="total" value="{{ $item->price * $item->quantity }}" type="text" name="price[]" class="form-control" /></td>
              <td class="col-md-2">
                  <button type="button" class="btn btn-danger">
                  Delete</button>
@@ -107,29 +107,63 @@
         <script>
         $(document).ready(function(){
 
+          $(document).on('click change', 'select[name^="item"],input[name^=quantity]',function(){
+            //vars for qty form value, item price, and the result
+            var newQty = $('input[name^=quantity]');
+            var newParent = $('select option:selected').parent().parent().parent().find('td.col-md-3').children();
+            var newPrice = $('select option:selected');
+            //set array vars for storing the form values
+            var q = [];
+            var a = [];
+            var b = [];
+            //
+            newQty.each(function(){
+              q.push($(this).val());
+            });
+
+            newParent.each(function(i, val){
+              a.push($(this));
+
+            });
+            $('select option:selected').each(function(e, valb){
+              console.log($(this).text());
+              b.push($(this).text());
+
+            });
+
+            for(i = 0; i<$('select option:selected').length;i++){
+              a[i].val(b[i] * q[i]);
+            }
+
+          });
+
+          $(document).on('click','.btn-danger',function(){
+            $(this).parent().parent().remove();
+          })
+
     var i = 1;
         $('#add-form').click(function() {
               i++;
               $('#list').replaceWith('<input type="hidden" id="list" name="list" value='+i+'></input>');
               $('#add-me').append(
-                 '<tbody id="row'+i+'"><tr>'+
-                   '<td class="col-md-2">'+
-                      '<input id="quantity" onkeypress="return event.charCode >= 48 && event.charCode <=57" type="text" name="quantity[]" class="form-control"/>'
-                  +'</td>'
-                  +'<td class="col-md-7">'
-                      +'<select class="form-control" id="item" name="item[]">'
-                        +'@foreach($products as $product)'
-                          +'<option value={{$product->id}}>{{$product->item}} - {{$product->price}}</option>'
-                        +'@endforeach'
-                      +'</select>'
-                  +'</td>'
-                  +'<td class="col-md-3">'
-                      +'<input type="text" name="price[]" class="form-control" />'
-                  +'</td>'
-                  +'<td class="col-md-2">'
-                      +'<button id="+i+" type="button" class="btn btn-danger delegated-btn">Delete</button>'
-                  +'</td>'
-              +'</tr></tbody>'
+                '<tbody id="row'+i+'"><tr>'+
+                  '<td class="col-md-2">'+
+                     '<input onkeypress="return event.charCode >= 48 && event.charCode <=57" type="text" name="quantity[]" class="form-control"/>'
+                 +'</td>'
+                 +'<td class="col-md-7">'
+                     +'<select class="form-control" id="item" name="item[]">'
+                       +'@foreach($products as $product)'
+                         +'<option value={{$product->id}} label="{{$product->item}} - {{$product->price}}">{{$product->price}}</option>'
+                       +'@endforeach'
+                     +'</select>'
+                 +'</td>'
+                 +'<td class="col-md-3">'
+                     +'<input type="text" name="price[]" class="total" />'
+                 +'</td>'
+                 +'<td class="col-md-2">'
+                     +'<button type="button" class="btn btn-danger">Delete</button>'
+                 +'</td>'
+             +'</tr></tbody>'
               );
         });
 

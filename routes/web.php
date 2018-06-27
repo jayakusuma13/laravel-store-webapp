@@ -13,6 +13,10 @@
 
 Route::get('/', 'TestController@index');
 
+Route::get('/main', 'TestController@index');
+
+Route::get('/analytics', 'TestController@analytics');
+
 Route::get('/index','PostController@index');
 
 Route::resource('invoices','InvoiceController');
